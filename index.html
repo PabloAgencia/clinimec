@@ -2754,13 +2754,23 @@ if('IntersectionObserver' in window){
     // gratuita para presupuesto cerrado y personalizado.
     // ================================================================
     const PRICES = {
+      // Medicina estética
+      botox:           "desde 180€/zona · completo desde 290€",
+      hialuronicoLab:  "desde 250€",
+      hialuronicoVol:  "desde 290€ (pómulos/surcos/mentón)",
+      rinomodelacion:  "desde 350€",
+      mesoterapia:     "desde 85€/sesión · pack 4 sesiones desde 300€",
       bioplastias:     "desde 250€ · valoración gratuita",
       varices:         "desde 120€ por sesión",
       inestetismos:    "desde 80€ según tipo y extensión",
       hilos:           "desde 400€ · resultados inmediatos",
       peeling:         "desde 90€ (superficial) · profundo desde 180€",
+      rejuvenecimiento:"según protocolo personalizado · valoración gratuita",
+      antiedad:        "según protocolo personalizado · valoración gratuita",
+      corporales:      "según zona y protocolo · valoración gratuita",
+      // Cirugía estética
       liposuccion:     "desde 1.500€ según zona · lipolaser disponible",
-      mamas:           "desde 3.000€ · prótesis incluidas",
+      mamas:           "valoración gratuita para presupuesto personalizado",
       abdominoplastia: "desde 2.500€",
       blefaroplastia:  "desde 1.200€ (superior o inferior)",
       otoplastia:      "desde 1.000€",
@@ -2882,7 +2892,7 @@ if('IntersectionObserver' in window){
       { id: 'est_tratamientos',
         keywords: ['tratamientos','tratamiento','que tratamientos','que ofreceis','que haceis','servicios','que servicios','que ofreces','catalogo','medicina estetica','que tipo'],
         response:
-          `En Clinimec ofrecemos los siguientes tratamientos de medicina y cirugía estética:\n\n• Bioplastias\n• Varices y Arañas Vasculares\n• Inestetismos Cutáneos\n• Hilos Tensores\n• Peeling Químico\n• Liposucción y Lipolaser\n• Aumento de Mamas\n• Abdominoplastia\n• Blefaroplastia\n• Otoplastia\n• Ninfoplastia\n\n¿Sobre cuál te interesa saber más? ✨`,
+          `En Clinimec ofrecemos tratamientos de medicina y cirugía estética:\n\n✨ MEDICINA ESTÉTICA:\n• Bioplastias / Ácido Hialurónico\n• Botox y Neuromoduladores\n• Hilos Tensores\n• Varices y Arañas Vasculares\n• Peeling Químico\n• Mesoterapia Facial\n• Inestetismos Cutáneos\n\n🔬 CIRUGÍA ESTÉTICA:\n• Liposucción y Lipolaser\n• Abdominoplastia\n• Cirugía de Mamas\n• Blefaroplastia\n• Otoplastia\n• Ninfoplastia\n\n¿Sobre cuál te interesa saber más? ✨`,
         quickReplies: [
           { label: 'Bioplastias',   send: 'bioplastias' },
           { label: 'Hilos Tensores',send: 'hilos tensores' },
@@ -2897,7 +2907,7 @@ if('IntersectionObserver' in window){
       { id: 'est_precios',
         keywords: ['precio','precios','cuanto cuesta','cuanto vale','tarifa','tarifas','presupuesto','coste','cobrais','cuanto sale','cuanto me cuesta','cuanto seria','barato','economico','vale','que precio'],
         response:
-          `Los precios varían según el tratamiento. Como referencia orientativa:\n\n• Botox: ${PRICES.botox}\n• Hialurónico (labios): ${PRICES.hialuronicoLab}\n• Hialurónico (volumen): ${PRICES.hialuronicoVol}\n• Rinomodelación: ${PRICES.rinomodelacion}\n• Mesoterapia: ${PRICES.mesoterapia}\n• Peeling: ${PRICES.peeling}\n\nPara un presupuesto cerrado y personalizado, la primera consulta de valoración es totalmente gratuita y sin compromiso. 🤍`,
+          `Los precios varían según el tratamiento. Como referencia orientativa:\n\n✨ MEDICINA ESTÉTICA:\n• Botox: ${PRICES.botox}\n• Ácido Hialurónico (labios): ${PRICES.hialuronicoLab}\n• Ácido Hialurónico (pómulos/surcos): ${PRICES.hialuronicoVol}\n• Rinomodelación sin cirugía: ${PRICES.rinomodelacion}\n• Hilos Tensores: ${PRICES.hilos}\n• Mesoterapia Facial: ${PRICES.mesoterapia}\n• Peeling Químico: ${PRICES.peeling}\n• Bioplastias: ${PRICES.bioplastias}\n• Varices / Arañas: ${PRICES.varices}\n\n🔬 CIRUGÍA ESTÉTICA:\n• Blefaroplastia: ${PRICES.blefaroplastia}\n• Otoplastia: ${PRICES.otoplastia}\n• Ninfoplastia: ${PRICES.ninfoplastia}\n• Liposucción: ${PRICES.liposuccion}\n• Abdominoplastia: ${PRICES.abdominoplastia}\n• Cirugía de Mamas: ${PRICES.mamas}\n\nLa primera consulta de valoración es GRATUITA y SIN COMPROMISO. 🤍`,
         quickReplies: [
           wa('💬 Pedir consulta gratuita', PREFILL_CITA),
           { label: 'Ver tratamientos', send: 'tratamientos' }
