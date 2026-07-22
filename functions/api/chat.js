@@ -56,9 +56,12 @@ COMPORTAMIENTO PROACTIVO — MUY IMPORTANTE:
 4. La consulta gratuita es tu mejor herramienta — ofrécela siempre como el siguiente paso más fácil.
 
 CITAS — FLUJO OBLIGATORIO:
+Antes de buscar huecos, pregunta SIEMPRE qué tratamiento le interesa (de la lista de servicios) si no lo ha dicho ya. No agendes un hueco genérico sin saber para qué es.
 Cuando alguien quiera pedir cita o reservar, SIEMPRE ofrece las DOS opciones en el mismo mensaje antes de buscar huecos:
   "¿Cómo prefieres hacerlo? Puedo buscarte un hueco disponible y reservarlo ahora mismo aquí, o si prefieres hablar con el equipo primero, escríbenos por WhatsApp: https://wa.me/${NEGOCIO.whatsapp} 💬"
 Si el usuario elige reservar aquí: consulta huecos disponibles, muestra 3-4 opciones concretas de fecha y hora, pide nombre y email, crea la cita.
+Datos obligatorios antes de reservar: TRATAMIENTO de interés, nombre y email. Si falta cualquiera, pídelo explícitamente y espera la respuesta.
+REGLA INQUEBRANTABLE: solo puedes decir que la cita está reservada/confirmada DESPUÉS de recibir success:true como resultado real de la herramienta create_booking. Está PROHIBIDO decir "listo", "confirmado", "reservado" o similar sin haber ejecutado create_booking con éxito. Si create_booking devuelve un error, dilo con naturalidad y ofrece el WhatsApp como alternativa — nunca finjas que se reservó.
 Confirma siempre con día, hora y que recibirán email de confirmación. Tras confirmar: "Si tienes cualquier duda antes, escríbenos por WhatsApp: https://wa.me/${NEGOCIO.whatsapp}"
 NUNCA menciones "Cal.com", "plataforma" ni ningún software externo. Di siempre "nuestra agenda" o "aquí mismo".
 
@@ -90,15 +93,16 @@ const tools = [
   },
   {
     name: "create_booking",
-    description: "Crea la cita cuando el cliente confirmó hora, nombre y email.",
+    description: "Crea la cita cuando el cliente confirmó tratamiento, hora, nombre y email.",
     input_schema: {
       type: "object",
       properties: {
         start_datetime: { type: "string", description: "Fecha y hora ISO 8601 UTC. España verano = UTC+2 (9:00 Madrid = 07:00Z)" },
         attendee_name: { type: "string", description: "Nombre del cliente" },
-        attendee_email: { type: "string", description: "Email del cliente" }
+        attendee_email: { type: "string", description: "Email del cliente" },
+        service: { type: "string", description: "Tratamiento que solicita el cliente" }
       },
-      required: ["start_datetime", "attendee_name", "attendee_email"]
+      required: ["start_datetime", "attendee_name", "attendee_email", "service"]
     }
   }
 ]
@@ -121,6 +125,9 @@ async function getAvailableSlots(input, calApiKey, eventTypeId) {
 }
 
 async function createBooking(input, calApiKey, eventTypeId) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.attendee_email || '')) {
+    return { error: 'Email no válido, pide al cliente que lo repita' }
+  }
   const res = await fetch('https://api.cal.eu/v2/bookings', {
     method: 'POST',
     headers: {
@@ -132,7 +139,7 @@ async function createBooking(input, calApiKey, eventTypeId) {
       eventTypeId: parseInt(eventTypeId),
       start: input.start_datetime,
       attendee: { name: input.attendee_name, email: input.attendee_email, timeZone: 'Europe/Madrid', language: 'es' },
-      metadata: {}
+      metadata: { servicio: input.service || '' }
     })
   })
   const data = await res.json()
@@ -178,7 +185,8 @@ export async function onRequestPost(context) {
     if (currentMessages.length > 12) currentMessages = currentMessages.slice(-12)
     const today = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Europe/Madrid' })
     const systemWithDate = SYSTEM_PROMPT + `\n\nFECHA ACTUAL: Hoy es ${today}. Úsala para calcular fechas relativas.`
-    while (true) {
+    const MAX_TOOL_ROUNDS = 5
+    for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -200,6 +208,12 @@ export async function onRequestPost(context) {
         const textBlock = data.content.find(b => b.type === 'text')
         return Response.json(
           { reply: textBlock ? textBlock.text : 'Lo siento, hubo un problema.' },
+          { headers: { 'Access-Control-Allow-Origin': '*' } }
+        )
+      }
+      if (round === MAX_TOOL_ROUNDS) {
+        return Response.json(
+          { reply: `Estoy teniendo problemas para completar la reserva. Escríbenos directamente por WhatsApp: https://wa.me/${NEGOCIO.whatsapp} 💬` },
           { headers: { 'Access-Control-Allow-Origin': '*' } }
         )
       }
